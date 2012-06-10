@@ -1,0 +1,9 @@
+GEM
+  specs:
+    crypt (1.1.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  crypt
