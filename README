@@ -1,0 +1,14 @@
+Delphian
+
+simple script for encrypt/decrypt a file containing a list of your passwords.
+
+there are currently only two main commands:
+
+    encrypt <unencrypted_file> <output_file>
+
+This will encrypt the file and write out results to the filename in the second parameter
+
+    decrypt <encrypted_file> <output_file>
+
+This will decrypt file and write out results to the filename in the second parameter
+
