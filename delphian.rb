@@ -23,7 +23,7 @@ begin
 	if string_is_nil_or_empty(filename1) || !File.exists?(filename1)
 		puts "first parameter is an invalid filename: #{filename1}"
 		puts "check if it exists" 
-		return
+		exit 1
 	end
 
 	dirname = File.dirname(filename2)
@@ -50,7 +50,7 @@ begin
 	pid = Process.spawn("mvim", filename2)
 	Process.detach(pid)
 
-rescue NoMethodError, Interrupt
+rescue NoMethodError, Interrupt => e
 	system "stty echo"
 	exit
 end
