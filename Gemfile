@@ -1,1 +1,1 @@
-gem 'crypt'
+gem 'crypt19'
