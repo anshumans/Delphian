@@ -66,4 +66,8 @@ begin
 		pid = Process.spawn("mvim", filename2)
 		Process.detach(pid)
 	end
+
+rescue NoMethodError, Interrupt => e
+	system "stty echo"
+	raise e
 end
