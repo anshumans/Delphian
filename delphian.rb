@@ -27,7 +27,7 @@ begin
 	action = ARGV[0]
 
 	if action == 'console'
-		DelphianConsole::run
+		DelphianConsole.new.run
 	else
 		if (ARGV.length < 3)
 			print_help

@@ -1,16 +1,33 @@
 require_relative 'delphian_commands'
 
-module DelphianConsole
-  def self.run
+class DelphianConsole
+  def run
     while (input = prompt) != DelphianCommands::Exit
-      puts "console runnings"
+      handle(input)
     end
 
     puts "exiting ..."
   end
 
-  def self.prompt
-    puts "Enter command (type 'help' or '?' for list of commands):"
+  def prompt
+    puts "Enter command (type 'help' for list of commands):"
     $stdin.gets.strip
+  end
+
+  def handle(input)
+    case input
+    when DelphianCommands::Help
+      print_help
+    end
+  end
+
+  def print_help
+    puts <<END_OF_BODY
+
+
+#{DelphianCommands::Exit}        exit interactive session
+
+
+END_OF_BODY
   end
 end
