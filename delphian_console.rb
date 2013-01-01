@@ -32,6 +32,8 @@ class DelphianConsole
       load_encrypted_file
     when DelphianCommands::List
       list_entries
+    when DelphianCommands::Close
+      close_file
     end
   end
 
@@ -82,5 +84,12 @@ END_OF_BODY
     @password_entries.each {|entry|
       puts entry.to_s
     }
+  end
+
+  def close_file
+    @password_file.close
+    @password_file = nil
+    @blowfish = nil
+    @password_entries = nil
   end
 end
