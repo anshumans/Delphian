@@ -1,4 +1,5 @@
 require_relative 'delphian_commands'
+require_relative 'password_entry'
 require 'stringio'
 
 class DelphianConsole
@@ -29,6 +30,8 @@ class DelphianConsole
       print_help
     when DelphianCommands::Load
       load_encrypted_file
+    when DelphianCommands::List
+      list_entries
     end
   end
 
@@ -39,7 +42,8 @@ class DelphianConsole
 #{DelphianCommands::Exit}        exit interactive session
 #{DelphianCommands::Load}        load encrypted password file
 #{DelphianCommands::Save}        save changes to an encrypted file
-#{DelphianCommands::Close}        close loaded password file
+#{DelphianCommands::Close}       close loaded password file
+#{DelphianCommands::List}        list entries
 
 
 END_OF_BODY
@@ -59,8 +63,24 @@ END_OF_BODY
     @blowfish = get_passphrase
 
     @blowfish.decrypt_stream(@password_file, raw_decryption)
-    puts "\nPassword File:\n"
-    puts raw_decryption.string
-    
+    # puts "\nPassword File:\n"
+    # puts raw_decryption.string
+
+    @password_entries = []
+    raw_decryption.string.split("\n").each {|line|
+      @password_entries << PasswordEntry.new(line)
+    }
+  end
+
+  def list_entries
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "\nEntries:\n"
+    @password_entries.each {|entry|
+      puts entry.to_s
+    }
   end
 end
