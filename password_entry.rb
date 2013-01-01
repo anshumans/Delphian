@@ -16,4 +16,9 @@ class PasswordEntry
   def to_s
     "#{name}\t#{url}\t#{username}\t#{password}"
   end
+
+  def contains(search_term)
+    return self.name.downcase.include?(search_term.downcase) || self.url.downcase.include?(search_term.downcase) || 
+    self.username.downcase.include?(search_term.downcase) || self.password.downcase.include?(search_term.downcase)
+  end
 end

@@ -4,6 +4,7 @@ class DelphianCommands
 
   Load = "load"
   List = "list"
+  Modify = "modify"
   Save = "save"
   Close = "close"
 end

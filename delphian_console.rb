@@ -34,6 +34,8 @@ class DelphianConsole
       list_entries
     when DelphianCommands::Close
       close_file
+    when DelphianCommands::Modify
+      modify
     end
   end
 
@@ -46,6 +48,7 @@ class DelphianConsole
 #{DelphianCommands::Save}        save changes to an encrypted file
 #{DelphianCommands::Close}       close loaded password file
 #{DelphianCommands::List}        list entries
+#{DelphianCommands::Modify}      modify an entry
 
 
 END_OF_BODY
@@ -87,9 +90,76 @@ END_OF_BODY
   end
 
   def close_file
-    @password_file.close
+    @password_file.close unless @password_file.nil?
     @password_file = nil
     @blowfish = nil
     @password_entries = nil
   end
+
+  def modify
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "Enter search term:"
+    search_term = STDIN.gets.strip
+    i = 0
+    matched_entries = []
+    @password_entries.each {|entry|
+      if entry.contains(search_term)
+        matched_entries << entry
+        puts "(#{i.to_s}) #{entry.to_s}"
+        i += 1
+      end
+    }
+
+    if matched_entries.count <= 0
+      puts "No matching entries"
+      return
+    end
+
+    puts "(#{i}) return to main menu"
+
+    puts "Enter number:"
+    entry = STDIN.gets.strip.to_i
+
+    if entry < 0 || entry >= matched_entries.count
+      puts "Returning to main menu"
+      return
+    end
+
+    begin
+      puts "Which attribute to you want to modify?"
+      puts "(1) name  #{matched_entries[entry].name}"
+      puts "(2) url  #{matched_entries[entry].url}"
+      puts "(3) username  #{matched_entries[entry].username}"
+      puts "(4) password  #{matched_entries[entry].password}"
+      puts "(5) done"
+
+      attribute_index = STDIN.gets.strip.to_i
+      if attribute_index < 0 || attribute_index > 5
+        next
+      end
+
+      if attribute_index == 5
+        puts "Returning to main menu"
+        return
+      end
+
+      puts "Enter new value:"
+      new_value = STDIN.gets.strip
+      case attribute_index
+      when 1
+        matched_entries[entry].name = new_value
+      when 2
+        matched_entries[entry].url = new_value
+      when 3
+        matched_entries[entry].username = new_value
+      when 4
+        matched_entries[entry].password = new_value
+      end
+    end while true
+  end
+
 end
