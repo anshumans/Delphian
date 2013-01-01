@@ -8,7 +8,7 @@ class DelphianConsole
       handle(input)
     end
 
-    puts "exiting ..."
+    puts "Exiting ..."
   end
 
   def prompt_command
@@ -36,6 +36,8 @@ class DelphianConsole
       close_file
     when DelphianCommands::Modify
       modify
+    when DelphianCommands::Save
+      save_entries
     end
   end
 
@@ -55,6 +57,11 @@ END_OF_BODY
   end
 
   def load_encrypted_file
+    unless @password_entries.nil?
+      puts "Closing currently loaded password entries"
+      close_file
+    end
+
     puts "Enter encrypted file to load: "
     filename = File.expand_path(STDIN.gets.chomp)
 
@@ -65,16 +72,16 @@ END_OF_BODY
 
     @password_file = File.new(filename, 'rb')
     raw_decryption = StringIO.new
-    @blowfish = get_passphrase
+    blowfish = get_passphrase
 
-    @blowfish.decrypt_stream(@password_file, raw_decryption)
-    # puts "\nPassword File:\n"
-    # puts raw_decryption.string
+    blowfish.decrypt_stream(@password_file, raw_decryption)
 
     @password_entries = []
     raw_decryption.string.split("\n").each {|line|
       @password_entries << PasswordEntry.new(line)
     }
+
+    puts "Password entries successfully loaded."
   end
 
   def list_entries
@@ -92,7 +99,6 @@ END_OF_BODY
   def close_file
     @password_file.close unless @password_file.nil?
     @password_file = nil
-    @blowfish = nil
     @password_entries = nil
   end
 
@@ -138,7 +144,7 @@ END_OF_BODY
       puts "(5) done"
 
       attribute_index = STDIN.gets.strip.to_i
-      if attribute_index < 0 || attribute_index > 5
+      if attribute_index <= 0 || attribute_index > 5
         next
       end
 
@@ -162,4 +168,45 @@ END_OF_BODY
     end while true
   end
 
+  def save_entries
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "Enter file to save to: "
+    filename = File.expand_path(STDIN.gets.chomp)
+
+    if File.file?(filename)
+      while true
+        puts "#{filename} exists. Overwrite? (y/n)"
+        confirm = STDIN.gets.strip
+        if confirm =~ /\An/i
+          return
+        elsif confirm =~/\Ay/i
+          break
+        else
+          puts "invalid input"
+        end
+      end
+
+      File.delete(filename)
+    end
+
+    # serialize in-memory password entries to string
+    raw_unencryption = StringIO.new("", "w+")
+    @password_entries.each {|entry|
+      raw_unencryption.write entry.to_serialized_format
+      raw_unencryption.write "\n"
+    }
+    raw_unencryption.rewind
+
+    # get file handle and passphrase
+    save_file = File.new(filename, 'wb+')
+    blowfish = get_passphrase
+
+    blowfish.encrypt_stream(raw_unencryption, save_file)
+
+    puts "Password entries successfully saved."
+  end
 end

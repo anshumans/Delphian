@@ -17,6 +17,10 @@ class PasswordEntry
     "#{name}\t#{url}\t#{username}\t#{password}"
   end
 
+  def to_serialized_format
+    "#{name},#{url},#{username},#{password}"
+  end
+
   def contains(search_term)
     return self.name.downcase.include?(search_term.downcase) || self.url.downcase.include?(search_term.downcase) || 
     self.username.downcase.include?(search_term.downcase) || self.password.downcase.include?(search_term.downcase)
