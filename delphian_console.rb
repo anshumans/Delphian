@@ -33,13 +33,17 @@ class DelphianConsole
     when DelphianCommands::List
       list_entries
     when DelphianCommands::Close
-      close_file
+      close
     when DelphianCommands::Modify
       modify
     when DelphianCommands::Add
       add_entry
+    when DelphianCommands::Remove
+      remove_entry
     when DelphianCommands::Save
       save_entries
+    when DelphianCommands::New
+      create_blank_entries
     when DelphianCommands::Search
       search
     when DelphianCommands::Stats
@@ -53,22 +57,29 @@ class DelphianConsole
 
 #{DelphianCommands::Exit}        exit interactive session
 #{DelphianCommands::Load}        load encrypted password file
-#{DelphianCommands::Save}        save changes to an encrypted file
-#{DelphianCommands::Close}       close loaded password file
 #{DelphianCommands::List}        list entries
 #{DelphianCommands::Modify}      modify an entry
 #{DelphianCommands::Add}         add a new entry
+#{DelphianCommands::Remove}      Remove entry 
+#{DelphianCommands::New}         create blank set of entries
 #{DelphianCommands::Search}      search through password entries
 #{DelphianCommands::Stats}       display stats on the passwords
+#{DelphianCommands::Save}        save changes to an encrypted file
+#{DelphianCommands::Close}       close loaded password entries
 
 
 END_OF_BODY
   end
 
+  def create_blank_entries
+    @password_entries = []
+    puts "Created empty set of password entries"
+  end
+
   def load_encrypted_file
     unless @password_entries.nil?
       puts "Closing currently loaded password entries"
-      close_file
+      close
     end
 
     puts "Enter encrypted file to load: "
@@ -107,10 +118,11 @@ END_OF_BODY
     }
   end
 
-  def close_file
+  def close
     @password_file.close unless @password_file.nil?
     @password_file = nil
     @password_entries = nil
+    puts "Entries closed"
   end
 
   def display_stats
@@ -178,6 +190,43 @@ END_OF_BODY
     puts "New entry added"
   end
 
+  def remove_entry
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "Enter search term:"
+    search_term = STDIN.gets.strip
+    i = 0
+    matched_entries = []
+    @password_entries.each {|entry|
+      if entry.contains(search_term)
+        matched_entries << entry
+        puts "(#{i.to_s}) #{entry.to_s}"
+        i += 1
+      end
+    }
+
+    if matched_entries.count <= 0
+      puts "No matching entries"
+      return
+    end
+
+    puts "(#{i}) return to main menu"
+
+    puts "Enter number of entry to delete:"
+    entry = STDIN.gets.strip.to_i
+
+    if entry < 0 || entry >= matched_entries.count
+      puts "Returning to main menu"
+      return
+    end
+
+    @password_entries.delete(matched_entries[entry])
+    puts "Entry successfully removed"
+  end
+
   def modify
     if @password_entries.nil?
       puts "No password file loaded"
@@ -242,6 +291,8 @@ END_OF_BODY
         matched_entries[entry].password = new_value
       end
     end while true
+
+    puts "Entry modified successfully"
   end
 
   def save_entries

@@ -6,6 +6,8 @@ class DelphianCommands
   List = "list"
   Modify = "modify"
   Add = "add"
+  Remove = "remove"
+  New = "new"
   Search = "search"
   Stats = "stats"
   Save = "save"
