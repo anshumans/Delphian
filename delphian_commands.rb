@@ -5,6 +5,7 @@ class DelphianCommands
   Load = "load"
   List = "list"
   Modify = "modify"
+  Add = "add"
   Search = "search"
   Stats = "stats"
   Save = "save"

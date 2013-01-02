@@ -5,12 +5,11 @@ class PasswordEntry
   attr_accessor :username
   attr_accessor :password
 
-  def initialize(line)
-    items = line.split(',')
-    self.name = items[0]
-    self.url = items[1]
-    self.username = items[2]
-    self.password = items[3]
+  def initialize(name, url, username, password)
+    self.name = name
+    self.url = url
+    self.username = username
+    self.password = password
   end
 
   def to_s

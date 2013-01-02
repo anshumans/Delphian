@@ -36,6 +36,8 @@ class DelphianConsole
       close_file
     when DelphianCommands::Modify
       modify
+    when DelphianCommands::Add
+      add_entry
     when DelphianCommands::Save
       save_entries
     when DelphianCommands::Search
@@ -55,6 +57,7 @@ class DelphianConsole
 #{DelphianCommands::Close}       close loaded password file
 #{DelphianCommands::List}        list entries
 #{DelphianCommands::Modify}      modify an entry
+#{DelphianCommands::Add}         add a new entry
 #{DelphianCommands::Search}      search through password entries
 #{DelphianCommands::Stats}       display stats on the passwords
 
@@ -84,7 +87,9 @@ END_OF_BODY
 
     @password_entries = []
     raw_decryption.string.split("\n").each {|line|
-      @password_entries << PasswordEntry.new(line)
+      items = line.split(',')
+      password_entry = PasswordEntry.new(items[0], items[1], items[2], items[3])
+      @password_entries << password_entry
     }
 
     puts "Password entries successfully loaded."
@@ -147,6 +152,30 @@ END_OF_BODY
         i += 1
       end
     }
+  end
+
+  def add_entry
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "Enter name:"
+    name = STDIN.gets.strip
+
+    puts "Enter url:"
+    url = STDIN.gets.strip
+
+    puts "Enter username:"
+    username = STDIN.gets.strip
+
+    puts "Enter password:"
+    password = STDIN.gets.strip
+
+    password_entry = PasswordEntry.new(name, url, username, password)
+    @password_entries << password_entry
+
+    puts "New entry added"
   end
 
   def modify
