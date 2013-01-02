@@ -1,14 +1,16 @@
 Delphian
 
-simple script for encrypt/decrypt a file containing a list of your passwords.
+Ruby program to encrypt/decrypt a file containing a list of your passwords.
+Also has an interactive console for additional features, like modifying contents and seeing stats.
 
-there are currently only two main commands:
+There are currently three main commands.
 
-    encrypt <unencrypted_file> <output_file>
+To encrypt the file and write out results to a file:
+    ruby delphian.rb encrypt <unencrypted_file> <output_file>
 
-This will encrypt the file and write out results to the filename in the second parameter
+To decrypt file and write out results to a file:
+    ruby delphian.rbdecrypt <encrypted_file> <output_file>
 
-    decrypt <encrypted_file> <output_file>
-
-This will decrypt file and write out results to the filename in the second parameter
+To run in interactive console:
+    ruby delphian.rb console
 
