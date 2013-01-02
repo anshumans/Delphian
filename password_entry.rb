@@ -22,7 +22,7 @@ class PasswordEntry
   end
 
   def contains(search_term)
-    return self.name.downcase.include?(search_term.downcase) || self.url.downcase.include?(search_term.downcase) || 
-    self.username.downcase.include?(search_term.downcase) || self.password.downcase.include?(search_term.downcase)
+    return self.name.include?(search_term) || self.url.include?(search_term) || 
+    self.username.include?(search_term) || self.password.include?(search_term)
   end
 end

@@ -40,6 +40,8 @@ class DelphianConsole
       save_entries
     when DelphianCommands::Search
       search
+    when DelphianCommands::Stats
+      display_stats
     end
   end
 
@@ -54,6 +56,7 @@ class DelphianConsole
 #{DelphianCommands::List}        list entries
 #{DelphianCommands::Modify}      modify an entry
 #{DelphianCommands::Search}      search through password entries
+#{DelphianCommands::Stats}       display stats on the passwords
 
 
 END_OF_BODY
@@ -103,6 +106,30 @@ END_OF_BODY
     @password_file.close unless @password_file.nil?
     @password_file = nil
     @password_entries = nil
+  end
+
+  def display_stats
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    total_count = @password_entries.count
+    password_count = {}
+    @password_entries.each {|entry|
+      if password_count[entry.password].nil?
+        password_count[entry.password] = 1
+      else
+        password_count[entry.password] += 1
+      end
+    }
+    password_count = password_count.sort_by {|key,value| value}.reverse
+
+    puts "Statistics:"
+    puts "Total entries: #{total_count}"
+    password_count.each { |entry|
+      puts "password: #{entry[0]}  count:#{entry[1]}  %:#{entry[1]/total_count.to_f}"
+    }
   end
 
   def search
