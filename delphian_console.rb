@@ -38,6 +38,8 @@ class DelphianConsole
       modify
     when DelphianCommands::Save
       save_entries
+    when DelphianCommands::Search
+      search
     end
   end
 
@@ -51,6 +53,7 @@ class DelphianConsole
 #{DelphianCommands::Close}       close loaded password file
 #{DelphianCommands::List}        list entries
 #{DelphianCommands::Modify}      modify an entry
+#{DelphianCommands::Search}      search through password entries
 
 
 END_OF_BODY
@@ -100,6 +103,23 @@ END_OF_BODY
     @password_file.close unless @password_file.nil?
     @password_file = nil
     @password_entries = nil
+  end
+
+  def search
+    if @password_entries.nil?
+      puts "No password file loaded"
+      return
+    end
+
+    puts "Enter search term:"
+    search_term = STDIN.gets.strip
+    i = 0
+    @password_entries.each {|entry|
+      if entry.contains(search_term)
+        puts "(#{i.to_s}) #{entry.to_s}"
+        i += 1
+      end
+    }
   end
 
   def modify
