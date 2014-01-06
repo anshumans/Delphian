@@ -24,6 +24,22 @@ class DelphianConsole
     return Crypt::Blowfish.new(key)
   end
 
+  def confirm_passphrase
+    while true
+      puts "What is your passphrase?"
+      system "stty -echo"
+      key = STDIN.gets.chomp
+      puts "Re-enter your passphrase to confirm:"
+      key_confirm = STDIN.gets.chomp
+      system "stty echo"
+      if key != key_confirm
+        puts "Passwords don't match. Try again."
+        next
+      end
+      return Crypt::Blowfish.new(key)
+    end
+  end
+
   def handle(input)
     case input
     when DelphianCommands::Help
@@ -330,7 +346,7 @@ END_OF_BODY
 
     # get file handle and passphrase
     save_file = File.new(filename, 'wb+')
-    blowfish = get_passphrase
+    blowfish = confirm_passphrase
 
     blowfish.encrypt_stream(raw_unencryption, save_file)
 
