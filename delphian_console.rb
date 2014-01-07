@@ -40,6 +40,29 @@ class DelphianConsole
     end
   end
 
+  def get_recent_files
+    recent_file = File.new("delphian_recent_files", 'r+')
+    if recent_file.nil?
+      return []
+    end
+
+    entries = recent_file.readlines.map {|entry| entry.strip}
+    recent_file.close
+    return entries
+  end
+
+  def save_entry(entry)
+    recent_files = get_recent_files.uniq
+    while recent_files.count > 5
+      recent_files.shift
+    end
+
+    recent_file = File.new("delphian_recent_files", 'w+')
+    recent_files.each {|file_entry| recent_file << file_entry << "\n"}
+    recent_file << entry << "\n"
+    recent_file.close
+  end
+
   def handle(input)
     case input
     when DelphianCommands::Help
@@ -92,18 +115,51 @@ END_OF_BODY
     puts "Created empty set of password entries"
   end
 
-  def load_encrypted_file
-    unless @password_entries.nil?
-      puts "Closing currently loaded password entries"
-      close
-    end
-
+  def get_filename
     puts "Enter encrypted file to load: "
     filename = File.expand_path(STDIN.gets.chomp)
 
     unless File.file?(filename)
       puts "#{filename} doesn't exist"
       return
+    end
+    return filename
+  end
+
+  def load_encrypted_file
+    unless @password_entries.nil?
+      puts "Closing currently loaded password entries"
+      close
+    end
+
+    recent_entries = get_recent_files
+
+    if recent_entries.count <= 0
+      filename = get_filename
+      return if filename.nil?
+      save_entry(filename)
+    else
+      puts "Select an option:"
+      i = 0
+      recent_entries.each {|entry|
+        puts "(#{i}) #{entry}"
+        i += 1
+      }
+
+      puts "(#{i}) Enter filename"
+
+      option = STDIN.gets.strip.to_i
+      if option >= 0 && option < recent_entries.count
+        filename = recent_entries[option]
+        unless File.file?(filename)
+          puts "#{filename} doesn't exist"
+          return
+        end
+      else
+        filename = get_filename
+        return if filename.nil?
+        save_entry(filename)
+      end
     end
 
     @password_file = File.new(filename, 'rb')
